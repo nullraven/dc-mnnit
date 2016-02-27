@@ -10,7 +10,7 @@ Site for monitoring active DC hubs, proxies and file requests (172.31.9.69)
 
 
 ## Special Instructions:
-- Create file `dbdetails.php` containing constants `DB_HOST`,`DB_USER`,`DB_PASS`
+- Create file `include/dbdetails.php` containing constants `DB_HOST`,`DB_USER`,`DB_PASS`,`CONST_SITE_URL`
 - Import database `dcp.sql`
 
 

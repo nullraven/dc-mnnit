@@ -1,5 +1,5 @@
 <?php
-	include('function.php');
+	include('../include/function.php');
 	$con=dbconnect();
 	date_default_timezone_set("Asia/Kolkata");
 	
@@ -32,15 +32,25 @@
 		/*if a hub is not online for more than 1 month, delete it. :)*/
 		if((time()-$at)>$max && $at!='')
 		{
-			$query="insert into hubs_archive (`ip`,`port`,`when`) VALUES (\"$ip\",\"$port\",\"".time()."\") ";
-			$con->query($query);
-			$query="delete from hubs_info where ip=\"$ip\" and port=\"$port\"";
-			$con->query($query);
+			$query="insert into hubs_archive (`ip`,`port`,`when`) VALUES (?,?,\"".time()."\") ";
+			$stmt=$con->prepare($query);
+			$stmt->bind_param("ss",$ip,$port);
+			$stmt->execute();
+			$stmt->close();
+			
+			$query="delete from hubs_info where ip=? and port=?";
+			$stmt=$con->prepare($query);
+			$stmt->bind_param("ss",$ip,$port);
+			$stmt->execute();
+			$stmt->close();
 		}
 		echo "$ip:$port => $status <br>";
 		
-		echo $query="update hubs_info set status=\"$status\",last_online=\"$at\",totcount=totcount+1  $olcount where ip=\"$ip\" and port=\"$port\"";
-		$con->query($query);
+		echo $query="update hubs_info set status=\"$status\",last_online=\"$at\",totcount=totcount+1  $olcount where ip=? and port=?";
+		$stmt=$con->prepare($query);
+		$stmt->bind_param("ss",$ip,$port);
+		$stmt->execute();
+		$stmt->close();
 		/*$query="TRUNCATE table last_update";
 		$con->query($query);
 		$query="insert into last_update values (\"".time()."\")";*/

@@ -1,35 +1,12 @@
 <html>
-<head>
-<link rel="stylesheet" href="css/bootstrap.min.css">
-<link rel="stylesheet" href="css/bootstrap-theme.min.css">
-<link rel="stylesheet" href="css/mainsite.css">
-
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>DC @ MNNIT Allahabad </title>
-<script src="js/jquery-1.11.2.js"></script>
-<script src="js/bootstrap.min.js"></script>
-</head>
-<body>
-<!--<nav class="navbar navbar-inverse ">
-<div class="navbar-header">
-      <a class="navbar-brand" href="index.php">MNNIT DC</a>
-</div>
-<div>
-      <ul class="nav navbar-nav">
-        <li><a href="index.php">HUBS Status</a></li>
-      	  <li><a href="./addhub.php">Add new HUB</a></li>
-      	  <li><a href="./request.new.php">Request File</a></li>
-      		<li class="active"><a href="info.php">Info</a></li>
-      	
-      </ul>
-    </div>
-  </div>
-</nav>-->
 <?php
-include_once('function.php');
-session_start();
+	require_once("../include/function.php");
+?>
+
+<html>
+<?php
+
+get_head();
 getHeader("info.php");
 
 ?>

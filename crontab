@@ -1,0 +1,3 @@
+*/2 * * * * sh /var/www/html/dc/util/updatedc.sh
+*/15 * * * * sh /var/www/html/dc/util/updatespeed.sh
+

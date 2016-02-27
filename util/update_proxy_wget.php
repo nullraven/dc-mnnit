@@ -1,5 +1,5 @@
 <?php
-	include('function.php');
+	include('../include/function.php');
 	$con=dbconnect();
 	date_default_timezone_set("Asia/Kolkata");
 	

@@ -1,25 +1,16 @@
+<?php
+	require_once("../include/function.php");
+?>
+
 <html>
-<head>
-<link rel="stylesheet" href="css/bootstrap.min.css">
-<link rel="stylesheet" href="css/bootstrap-theme.min.css">
-<link rel="stylesheet" href="css/mainsite.css">
+<?=get_head()?>
 
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>DC @ MNNIT Allahabad	</title>
-<script src="js/jquery-1.11.2.js"></script>
-<script src="js/bootstrap.min.js"></script>
-</head>
 <body>
 <?php
-include_once('function.php');
-session_start();
 getHeader("addhub.php");
 $con=dbconnect();
 if(isset($_POST['submitbtn'])){
-	foreach($_POST as $a=>$b)
-		$_POST[$a]=validate($b);
+	
 	$errmsg="<span class=\"text-danger\">"; 
 	$errval=0;
 	if(!isset($_POST['hubname']) || empty($_POST['hubname'])){
@@ -122,28 +113,38 @@ if(isset($errval)){
 		$uname=$_POST['uname'];
 		$passwd=$_POST['passwd'];
 		$err=0;
-		$ch_q="select * from hubs_info where ip=\"$ip\" and port=\"$port\"";
-		$ch_r=$con->query($ch_q);
-		if($ch_r->num_rows)
+		$ch_q="select * from hubs_info where ip=? and port=?";
+		$stmt=$con->prepare($ch_q);
+		$stmt->bind_param("ss",$ip,$port);
+		$stmt->execute() or die($stmt->error);
+		$ch_r=$stmt->num_rows;
+		$stmt->close();
+		if($ch_r)
 		{
 			echo "<span class=\"text-danger\"><span class=\"glyphicon glyphicon-alert\"></span> hub already exists.<br></span></span>";			
 			$err=1;
 		}
-		$ch_q="select * from addrequest where ip=\"$ip\" and port=\"$port\"";
-		$ch_r=$con->query($ch_q);
-		if($ch_r->num_rows)
+		$ch_q="select * from addrequest where ip=? and port=?";
+		$stmt=$con->prepare($ch_q);
+		$stmt->bind_param("ss",$ip,$port);
+		$stmt->execute() or die($stmt->error);
+		$ch_r=$stmt->num_rows;
+		$stmt->close();
+		if($ch_r)
 		{
 			echo "<span class=\"text-danger\"><span class=\"glyphicon glyphicon-alert\"></span> hub already requested.<br></span></span>";			
 			$err=1;
 		}
 		if(!$err)
 		{
-			$uip=$_SERVER['HTTP_X_FORWARDED_FOR'];
+			$uip=getIP();
 			$ti=time();
 			$status="WAITING";
 			$ow=$_POST['ownername'];
-			$query="insert into addrequest (`name`,`ip`,`port`,`owner`,`time`,`status`,`username`,`password`,`remark`) VALUES (\"$name\",\"$ip\",\"$port\",\"$ow\",\"$ti\",\"$status\",\"$uname\",\"$passwd\",\"$uip\")";
-			$res=$con->query($query);
+			$query="insert into addrequest (`name`,`ip`,`port`,`owner`,`time`,`status`,`username`,`password`,`remark`) VALUES (?,?,?,?,?,?,?,?,?)";
+			$stmt=$con->prepare($query);
+			$stmt->bind_param("sssssssss",$name,$ip,$port,$ow,$ti,$status,$uname,$passwd,$uip);
+			$res=$stmt->execute() or die($stmt->error);
 			if($res)
 			{
 					echo "<span class=\"text-success\"><span class=\"glyphicon glyphicon-ok\"></span> hub Successfully added!! It will be added to the main list shortly. :)</span>";
@@ -160,7 +161,7 @@ if(isset($errval)){
 }
 
  ?>
-	<form class="form-horizontal" method="post" action="">
+	<form class="form-horizontal" method="post" action="#">
 <fieldset>
 
 <!-- Form Name -->

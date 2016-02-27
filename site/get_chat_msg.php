@@ -1,6 +1,6 @@
 <?php
 
-include('function.php');
+include('../include/function.php');
 foreach($_POST as $a=>$b)
 	$_POST[$a]=validate($b);
 //msg, chatid, cid1,cid2;

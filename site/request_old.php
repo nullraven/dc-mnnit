@@ -1,27 +1,15 @@
-<html>
-<head>
-<link rel="stylesheet" href="css/bootstrap.min.css">
-<link rel="stylesheet" href="css/bootstrap-theme.min.css">
-<link rel="stylesheet" href="css/mainsite.css">
 
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>MNNIT, Allahabad	</title>
-
-<script src="js/jquery-1.11.2.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/search.js"></script>
-</head>
-<body>
 <?php
-$ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
-include_once('function.php');
+	require_once("../include/function.php");
+?>
+
+<html>
+<?php
+
+get_head();
+$ip=getIP();
 getHeader("request.php");
-foreach($_POST as $a=>$b)
-	$_POST[$a]=validate($b);
-foreach($_GET as $a=>$b)
-	$_GET[$a]=validate($b);
+
 $mysqli=dbconnect();
 if(isset($_POST['submit'])){
 	$errval=0;

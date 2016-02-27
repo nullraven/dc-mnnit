@@ -1,13 +1,10 @@
+<?php
+	require_once("../include/function.php");
+?>
+
 <html>
-<head>
-<link rel="stylesheet" href="css/bootstrap.min.css">
-<link rel="stylesheet" href="css/bootstrap-theme.min.css">
-<link rel="stylesheet" href="css/mainsite.css">
-<link rel="stylesheet" href="tablesorter/css/theme.blue.css">
-<script src="js/jquery-1.11.2.js"></script>
-<script type="text/javascript" src="tablesorter/js/jquery.tablesorter.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/search.js"></script>
+<?=get_head()?>
+
 <script>
 $(document).ready(function(e) {
     $("#hubtab").tablesorter({sortList: [[2,1],[4,1],[3,1]]});
@@ -16,12 +13,7 @@ $(document).ready(function(e) {
     });
 });
 </script>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>DC @ MNNIT Allahabad	</title>
-
-</head>
 <body onLoad="setInterval('window.location.reload()', 120000);">
 <div id="outerpredictor"  onclick="displaynone()">
     <div id="predictor">
@@ -41,10 +33,6 @@ $(document).ready(function(e) {
 
 
 <?php 
-include_once('function.php');
-if(!isset($_SESSION))
-	session_start();
-
 if(!isset($_SESSION['count']) || (date()-$_SESSION['opentime'])>5*60){
 	$_SESSION['count']=0;
 	$_SESSION['opentime']=date();
@@ -164,10 +152,10 @@ getFooter();
 </body>
 
 
-<script language="javascript" type="text/javascript" src="flot/jquery.flot.js"></script>
-<script language="javascript" type="text/javascript" src="flot/jquery.flot.symbol.js"></script>
-<script language="javascript" type="text/javascript" src="flot/jquery.flot.tooltip.js"></script>
-<script type="text/javascript" src="flot/jquery.flot.axislabels.js"></script>
+<script src="<?=CONST_SITE_URL?>/flot/jquery.flot.js"></script>
+<script src="<?=CONST_SITE_URL?>/flot/jquery.flot.symbol.js"></script>
+<script src="<?=CONST_SITE_URL?>/flot/jquery.flot.tooltip.js"></script>
+<script src="<?=CONST_SITE_URL?>/flot/jquery.flot.axislabels.js"></script>
 <script>
 /*$(document).ready(function(e) {
     $("#hubtab tr").click(function(e) {

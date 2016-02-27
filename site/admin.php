@@ -1,17 +1,9 @@
+<?php
+	require_once("../include/function.php");
+?>
+
 <html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="css/bootstrap.min.css">
-<link rel="stylesheet" href="css/bootstrap-theme.min.css">
-<link rel="stylesheet" href="css/mainsite.css">
-<link rel="stylesheet" href="tablesorter/css/theme.blue.css">
-
-
-<script src="js/jquery-1.11.2.js"></script>
-<script type="text/javascript" src="tablesorter/js/jquery.tablesorter.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/search.js"></script>
+<?=get_head()?>
 
 <script type="text/javascript">
 $(document).ready(function(e) {
@@ -62,8 +54,6 @@ function fun3(cat)
 </script>
 
 
-<title>DC @ MNNIT Allahabad </title>
-
 
 <style>
 fieldset{
@@ -79,28 +69,11 @@ fieldset ul li{
 	
 }
 </style>
-</head>
+
 <body>
-<!--<nav class="navbar navbar-inverse ">
-<div class="navbar-header">
-      <a class="navbar-brand" href="index.php">MNNIT DC</a>
-</div>
-<div>
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="index.php"><span class="glyphicon glyphicon-list-alt"></span> HUBS Status</a></li>
-      	  <li><a href="./addhub.php"><span class="glyphicon glyphicon-plus-sign"></span> Add new HUB</a></li>
-      	  <li><a href="./request.php"><span class="glyphicon glyphicon-cloud-download"></span> Request File</a></li>
-      	<li ><a href="info.php"><span class="glyphicon glyphicon-info-sign"></span> Info</a></li>
-      	
-      </ul>
-    </div>
-  </div>
-</nav><br>-->
+
 <?php 
-include_once('function.php');
 $con=dbconnect();
-if(!isset($_SESSION))
-	session_start();
 getHeader("admin.php");
 if(!isset($_SESSION['admin']))
 {
@@ -192,7 +165,7 @@ else{
 				$selbox.='<option value="'.$i.'" '.$sl.'>'.$i.'</option>';
 			}
 			$st.='</select>';
-            echo "<tr><td>$req[category]</td><td>$req[name] ".$reg['torrent_link']?"<a href='' taget='_blank'>Torrent link</a>":""."</td><td class='tdsel'>$selbox</td><td><input type='text' id='mag_".$req['id']."' class='form-control' value='".$req['link']."' disabled/></td><td><button type='submit' class='btn btn-success' onclick='fun1(".$req['id'].")'><span class='glyphicon glyphicon-check'></span></button></td></tr>";
+            echo "<tr><td>$req[category]</td><td>$req[name] ".($reg['torrent_link']?"<a href='' taget='_blank'>Torrent link</a>":"")."</td><td class='tdsel'>$selbox</td><td><input type='text' id='mag_".$req['id']."' class='form-control' value='".$req['link']."' disabled/></td><td><button type='submit' class='btn btn-success' onclick='fun1(".$req['id'].")'><span class='glyphicon glyphicon-check'></span></button></td></tr>";
         }
         ?></tbody>
         </table>

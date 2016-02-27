@@ -1,15 +1,9 @@
+<?php
+	require_once("../include/function.php");
+?>
+
 <html>
-<head>
-<link rel="stylesheet" href="css/bootstrap.min.css">
-<link rel="stylesheet" href="css/bootstrap-theme.min.css">
-<link rel="stylesheet" href="css/mainsite.css">
-
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>DC @ MNNIT Allahabad	</title>
-<script src="js/jquery-1.11.2.js"></script>
-<script src="js/bootstrap.min.js"></script>
+<?=get_head()?>
 <script>
 function htmlentities(string, quote_style, charset, double_encode) {
   // discuss at: http://phpjs.org/functions/htmlentities/
@@ -61,12 +55,10 @@ function htmlentities(string, quote_style, charset, double_encode) {
   });
 }
 </script>
-</head>
+
 <body>
 <?php
 
-include_once('function.php');
-session_start();
 getHeader("addhub.php");
 $con=dbconnect();
 //if(getIP()!="172.31.9.25" && getIP()!="172.31.73.2")

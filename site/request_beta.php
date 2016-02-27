@@ -1,6 +1,5 @@
 <?php
-	session_start();
-	include_once('function.php');
+	require_once("../include/function.php");
 	
 	$stat_ar=array('Already Present','Fulfilled','Downloading','Pending','Invalid');
 	$categories=array();
@@ -17,17 +16,12 @@
 	}
 	//print_r($_SESSION['filters']['status']);
 ?>
-<html>
-<head>
-<link rel="stylesheet" href="css/bootstrap.min.css">
-<link rel="stylesheet" href="css/bootstrap-theme.min.css">
-<link rel="stylesheet" href="css/mainsite.css">
-<link rel="stylesheet" href="tablesorter/css/theme.blue.css">
-<link rel="stylesheet" href="chosen/chosen.min.css">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<?php
+	require_once("../include/function.php");
+?>
 
-<title>DC @ MNNIT Allahabad	</title>
+<html>
+<?=get_head()?>
 <style>
 #inames option{
 	height:40px;
@@ -37,11 +31,7 @@ label.no-styl{
 	font-weight:normal;
 }
 </style>
-<script src="js/jquery-1.11.2.js"></script>
-<script type="text/javascript" src="tablesorter/js/jquery.tablesorter.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/search.js"></script>
-<script type="text/javascript" src="chosen/chosen.jquery.min.js"></script>
+
 <script type="text/javascript">
 $(document).ready(function(e) {
 	
@@ -127,7 +117,7 @@ function fun3(cat)
 </head>
 <body>
 <?php
-$ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
+$ip=getIP();
 
 getHeader("request.php");
 /*foreach($_POST as $a=>$b)
@@ -153,7 +143,7 @@ if(isset($_POST['submit'])){
 		$errval++;
 	}
 	else {
-		$chkq="select id from dcrequests where name like ?";// and category like '$_POST[category]'
+		$chkq="select id from dcrequests_26_2_16 where name like ?";// and category like '$_POST[category]'
 		$stmt=$mysqli->prepare($chkq);
 		$stmt->bind_param('s',$name);
 		$stmt->execute();
@@ -165,7 +155,7 @@ if(isset($_POST['submit'])){
 			$errmsg="Request already exist!!!";
 		}
 		else {
-			$insertq="INSERT INTO dcrequests (`category`, `name`, `status`,`ip`) VALUES (?, ?,'Pending',?);";
+			echo $insertq="INSERT INTO dcrequests_26_2_16 (`category`, `name`, `status`,`ip`) VALUES (?, ?,'Pending',?);";
 			$stmt=$mysqli->prepare($insertq);
 			$stmt->bind_param('sss',$_POST['category'],$_POST['inames'],getIP());
 			$stmt->execute() or die($stmt->error);
@@ -293,7 +283,7 @@ if(isset($_POST['submit'])){
 	 $where_cat="'".implode("','",$_SESSION['filters']['category'])."'";
 	 $where_status="'".implode("','",$_SESSION['filters']['status'])."'";
 	
-	$qry="select count(*) from dcrequests where status!='r' and category in ($where_cat) and status in ($where_status)";
+	$qry="select count(*) from dcrequests_26_2_16 where status!='r' and category in ($where_cat) and status in ($where_status)";
 	$res=$mysqli->query($qry) or die ("Error counting entries"); 
 	$pgcnt=$res->fetch_array();
 	$pgcnt=$pgcnt[0];
@@ -308,7 +298,7 @@ if(isset($_POST['submit'])){
 	
 	$l1=($pg*$showperpg)  % $pgcnt;
 	//$datasrch="<datalist id='show_req'>";
-	$requestq="select * from dcrequests where status!='r' and category in ($where_cat) and status in ($where_status) order by timeofreq desc limit $l1,$showperpg";
+	$requestq="select * from dcrequests_26_2_16 where status!='r' and category in ($where_cat) and status in ($where_status) order by timeofreq desc limit $l1,$showperpg";
 	$res=$mysqli->query($requestq) or die($mysqli->error);
 	while($req=$res->fetch_array()){
 		//$datasrch.="<option value='$req[name]'></option>";
@@ -333,7 +323,7 @@ if(isset($_POST['submit'])){
     <nav class="col-sm-12 col-sm-offset-0" style="text-align:center">
       <ul class="pagination pagination-sm">
         <li>
-          <a href="request.php?pg=<?=abs($pg-1)?>&showperpg=<?=$showperpg?>" aria-label="Previous">
+          <a href="request_beta.php?pg=<?=abs($pg-1)?>&showperpg=<?=$showperpg?>" aria-label="Previous">
             <span aria-hidden="true">&laquo;</span>
           </a>
         </li>
@@ -341,14 +331,14 @@ if(isset($_POST['submit'])){
 		$t=0;
 		while(($t*$showperpg)<=$pgcnt){
 		if($pg==$t)
-			echo '<li class="active"><a href="request.php?pg='.$t.'&showperpg='.$showperpg.'">'.($t+1).'</a></li>';	
+			echo '<li class="active"><a href="request_beta.php?pg='.$t.'&showperpg='.$showperpg.'">'.($t+1).'</a></li>';	
 		else
-        	echo '<li><a href="request.php?pg='.$t.'&showperpg='.$showperpg.'">'.($t+1).'</a></li>';
+        	echo '<li><a href="request_beta.php?pg='.$t.'&showperpg='.$showperpg.'">'.($t+1).'</a></li>';
 		$t++;
 		}
 		?>
         <li>
-          <a href="request.php?pg=<?=($pg+1)?>&showperpg=<?=$showperpg?>" aria-label="Next">
+          <a href="request_beta.php?pg=<?=($pg+1)?>&showperpg=<?=$showperpg?>" aria-label="Next">
             <span aria-hidden="true">&raquo;</span>
           </a>
         </li>
