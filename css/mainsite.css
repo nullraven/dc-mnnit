@@ -1,0 +1,128 @@
+body
+{
+	height: 100%;
+    margin: 0;
+    background-attachment: fixed;
+	background-color: #EEFFEE; 
+	background-position: center center; 
+	background-repeat: no-repeat; 
+	background: -webkit-radial-gradient(#FFFFFF,#EEEEEE); 
+    background: -o-radial-gradient(#FFFFFF,#EEFFEE); 
+    background: -moz-radial-gradient(#FFFFFF,#EEFFEE);
+    background: radial-gradient(#FFFFFF,#EEEEEE); 
+
+}
+/*#footr{
+	margin-bottom:-38px;
+	transition:ease .5s;
+	opacity:.9;
+}*/
+#footr{
+	margin-bottom:-10px;
+}
+/*___________________________________________________-----------------------Proxy graphs----------------------------__________________________________*/
+#outerpredictor{
+	position:fixed;
+	top:0;
+	bottom:0;
+	right:0;
+	left:0;
+	z-index:9999;
+	background:rgba(0,0,0,.9);
+	pointer-events:none;
+	opacity:0;
+	transition:linear .5s;
+}
+#predictor{
+	opactiy:1;
+	//font-size:10px;
+	max-width:900px;
+	margin:3% auto;
+	background-color:#eee;
+	padding:2% 2%;
+	//pointer-events:auto;
+	z-index:99999;
+	border-radius:15px;
+}
+#cross{
+	position:relative;
+	width:30px;height:30px;
+	cursor:pointer;
+	line-height:30px;
+	text-align:center;
+	font:"Comic Sans MS", cursive;
+	color:#fff;
+	background-color:#F00;
+	font-weight:bold;
+	border-radius:100%;
+	top:-10px;
+	left:100%;
+}
+#cross:hover{
+	background-color:#09F;
+}
+
+.demo-container {
+	box-sizing: border-box;
+	width: 100%;
+	height: 75%;
+	padding: auto;
+	margin: auto;
+	border: 1px solid #ddd;
+	background: #fff;
+	background: linear-gradient(#f6f6f6 0, #fff 50px);
+	background: -o-linear-gradient(#f6f6f6 0, #fff 50px);
+	background: -ms-linear-gradient(#f6f6f6 0, #fff 50px);
+	background: -moz-linear-gradient(#f6f6f6 0, #fff 50px);
+	background: -webkit-linear-gradient(#f6f6f6 0, #fff 50px);
+	box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+	-o-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+	-ms-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+	-moz-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+	-webkit-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.demo-placeholder {
+	width: 100%;
+	height: 100%;
+	font-size: 14px;
+	line-height: 1.2em;
+}
+/*___________________________________________________-----------------------Proxy graphs----------------------------__________________________________*/
+
+
+
+@media only screen and (max-device-width: 620px){
+	#footr{
+		display:none;
+	}
+	*{
+		font-size:xx-small;
+	}
+	h1,h2,h3,h4,h5,h6{
+		font-size:xx-small;
+	}
+}
+
+#cht
+{
+	width:100%;
+}
+
+#upchat
+{
+	border:thin;
+	background-color:white;
+	height:60%;
+	width:80%;
+	margin-left:auto;
+	margin-right:auto;
+	overflow-y:scroll;
+}
+
+#downchat
+{
+	position:fixed;
+	bottom:0;
+	width:100%;
+}

@@ -1,0 +1,985 @@
+<?php
+require_once dirname(__FILE__) . '/../imdb.class.php';
+
+class imdbTest extends PHPUnit_Framework_TestCase {
+
+  /**
+   * IMDb IDs for testing:
+   * 0133093 = The Matrix (has everything)
+   * 0087544 = Nausicaa (foreign, nonascii)
+   * 1570728 = Crazy, Stupid, Love (no runtime in tech details (but has a runtime at top)
+   * 0078788 = Apocalypse Now (Two cuts, multiple languages)
+   * 0108052 = Schindler's List (multiple colours)
+   * 0338187 = The Last New Yorker (see full synopsis...)
+   * 2768262 = redirect to 2386868
+   * 1899250 = Mr. Considerate. short, no poster
+   * 0416449 = 300 (some multi bracket credits)
+   *
+   * 0306414 = The Wire (TV / has everything)
+   * 1286039 = Stargate Universe (multiple creators)
+   * 1027544 = Roary the Racing Car (TV show, almost everything missing)
+   *
+   * 0284717 = Crociati (tv movie, see full summary...)
+   */
+
+    public function testConstruct_from_ini_constructed_config() {
+        $config = new mdb_config(dirname(__FILE__) . '/resources/test.ini');
+        $imdb = new imdb('0133093', $config);
+        $this->assertEquals('test.local', $imdb->imdbsite);
+        $this->assertEquals('/somefolder', $imdb->cachedir);
+    }
+
+    // @TODO tests for other types
+    public function testMovietype_on_movie() {
+        $imdb = $this->getImdb();
+        $this->assertEquals('Movie', $imdb->movietype());
+    }
+
+    public function testMovietype_on_tv() {
+        $imdb = $this->getImdb("0306414");
+        $this->assertEquals('TV Series', $imdb->movietype());
+    }
+
+    public function testMovietype_on_tvMovie() {
+      // @todo I would've thought this should be TV Movie but it's actually Movie
+//        $imdb = $this->getImdb("284717");
+//        $this->assertEquals('TV Movie', $imdb->movietype());
+    }
+
+    public function testTitle() {
+        $imdb = $this->getImdb();
+        $this->assertEquals('The Matrix', $imdb->title());
+    }
+
+    //@TODO tests for titles with non ascii characters. Currently they're
+    // html entities, would be nice to decode them
+
+    public function testOrig_title_with_no_original() {
+        $imdb = $this->getImdb();
+        $this->assertEquals(null, $imdb->orig_title());
+    }
+
+    public function testOrig_title_with_original() {
+        $imdb = $this->getImdb('0087544');
+        $this->assertEquals('Kaze no tani no Naushika', $imdb->orig_title());
+    }
+
+    public function testYear_for_a_film() {
+        $imdb = $this->getImdb();
+        $this->assertEquals(1999, $imdb->year());
+    }
+
+    public function testYear_for_a_tv_show() {
+        $imdb = $this->getImdb("0306414");
+        $this->assertEquals(2002, $imdb->year());
+    }
+
+    public function testEndyear_for_a_film() {
+        // Film has no range, so endyear is the same as year
+        $imdb = $this->getImdb();
+        $this->assertEquals(1999, $imdb->endyear());
+    }
+
+    public function testEndyear_for_a_tv_show() {
+        $imdb = $this->getImdb("0306414");
+        $this->assertEquals(2008, $imdb->endyear());
+    }
+
+    public function testYearspan() {
+        // @TODO
+    }
+
+    public function testMovieTypes() {
+        // @TODO
+    }
+
+    public function testRuntime() {
+        $imdb = $this->getImdb();
+        $this->assertEquals(136, $imdb->runtime());
+    }
+
+    public function testRuntime_no_runtime_in_technical_details() {
+        $imdb = $this->getImdb('1570728');
+        $this->assertEquals(118, $imdb->runtime());
+    }
+
+    public function testRuntime_primary_where_multiple_exist() {
+        $imdb = $this->getImdb('0087544');
+        $this->assertEquals(117, $imdb->runtime());
+    }
+
+    // one plain unannotated runtime "136 min"
+    public function testRuntimes_one_runtime() {
+        $imdb = $this->getImdb();
+        $runtimes = $imdb->runtimes();
+        $this->assertEquals(136, $runtimes[0]['time']);
+    }
+
+    // Nausicaa's runtimes are "117 min | 95 min (1985) (edited)"
+    public function testRuntimes_two_runtimes_multiple_annotations() {
+        $imdb = $this->getImdb('0087544');
+        $runtimes = $imdb->runtimes();
+        $this->assertEquals(117, $runtimes[0]['time']);
+        $this->assertEquals(95, $runtimes[1]['time']);
+        $this->assertEquals(1985, $runtimes[1]['annotations'][0]);
+        $this->assertEquals('edited', $runtimes[1]['annotations'][1]);
+    }
+
+    // Apocalypse now "153 min | 202 min (Redux)"
+    public function testRuntimes_two_runtimes_one_annotation() {
+        $imdb = $this->getImdb('0078788');
+        $runtimes = $imdb->runtimes();
+        $this->assertEquals(153, $runtimes[0]['time']);
+        $this->assertEquals(202, $runtimes[1]['time']);
+        $this->assertEquals('Redux', $runtimes[1]['annotations'][0]);
+    }
+
+    public function testAspect_ratio() {
+        $imdb = $this->getImdb();
+        $this->assertEquals('2.35 : 1', $imdb->aspect_ratio());
+    }
+
+    public function testAspect_ratio_missing() {
+        // @TODO
+    }
+
+    public function testRating() {
+        $imdb = $this->getImdb();
+        $this->assertEquals('8.7', $imdb->rating());
+    }
+
+    public function testRating_no_rating() {
+        //@TODO
+    }
+
+    public function testVotes() {
+        $imdb = $this->getImdb();
+        $votes = $imdb->votes();
+        $this->assertGreaterThan(907000, $votes);
+        $this->assertLessThan(1500000, $votes);
+    }
+
+    public function testVotes_no_votes() {
+        //@TODO
+    }
+
+    public function testComment() {
+        //@TODO
+    }
+
+    public function testComment_split() {
+        //@TODO
+    }
+
+    public function testMovie_recommendations() {
+        //@TODO
+    }
+
+    public function testKeywords() {
+        //@TODO
+    }
+
+    public function testLanguage() {
+        //@TODO
+    }
+
+    public function testLanguages_onelanguage() {
+        $imdb = $this->getImdb();
+        $this->assertEquals(array('English'), $imdb->languages());
+    }
+
+    public function testLanguages_multiplelanguage() {
+        $imdb = $this->getImdb('0078788');
+        $languages = $imdb->languages();
+        $this->assertTrue(in_array('English', $languages));
+        $this->assertTrue(in_array('French', $languages));
+        $this->assertTrue(in_array('Vietnamese', $languages));
+        $this->assertTrue(in_array('Khmer', $languages));
+    }
+
+    public function testLanguages_nolanguage() {
+        //@TODO
+    }
+
+    public function testLanguages_detailed() {
+        //@TODO
+    }
+
+    public function testGenre() {
+        //@TODO .. this is a pretty terrible function that doesn't return anything useful
+        // Writing a test would be meaningless
+    }
+
+    // @TODO this function seems to have a fallback, although I'm not sure what to
+    // Primary match is to the genre listing just under the title, which this tests
+    public function testGenres_multiple() {
+        $imdb = $this->getImdb();
+        $genres = $imdb->genres();
+        $this->assertTrue(in_array('Action', $genres));
+        $this->assertTrue(in_array('Sci-Fi', $genres));
+    }
+
+    public function testGenres_none() {
+        //@TODO
+    }
+
+    public function testColors_one_color() {
+      $imdb = $this->getImdb();
+      $colors = $imdb->colors();
+
+      $this->assertInternalType('array', $colors);
+      $this->assertCount(1, $colors);
+      $this->assertEquals('Color', $colors[0]);
+    }
+
+    public function testColors_two_colors() {
+      $imdb = $this->getImdb('0108052');
+      $colors = $imdb->colors();
+
+      $this->assertInternalType('array', $colors);
+      $this->assertCount(2, $colors);
+      $this->assertEquals('Black and White', $colors[0]);
+      $this->assertEquals('Color', $colors[1]);
+    }
+
+    public function testCreator_no_creators() {
+      // A little weak to test a movie for this, but it is testing a missing field
+      $imdb = $this->getImdb('0133093');
+      $creators = $imdb->creator();
+
+      $this->assertInternalType('array', $creators);
+      $this->assertEquals(0, count($creators));
+    }
+
+    public function testCreator_one_creator() {
+      $imdb = $this->getImdb('0306414');
+      $creators = $imdb->creator();
+
+      $this->assertInternalType('array', $creators);
+      $this->assertEquals('David Simon', $creators[0]['name']);
+      $this->assertEquals('0800108', $creators[0]['imdb']);
+    }
+
+    public function testCreator_two_creators() {
+      $imdb = $this->getImdb('1286039');
+      $creators = $imdb->creator();
+
+      $this->assertInternalType('array', $creators);
+      $this->assertEquals('Robert C. Cooper', $creators[0]['name']);
+      $this->assertEquals('0178338', $creators[0]['imdb']);
+      $this->assertEquals('Brad Wright', $creators[1]['name']);
+      $this->assertEquals('0942249', $creators[1]['imdb']);
+    }
+
+    public function testTagline() {
+        //@TODO
+    }
+
+    public function testSeasons() {
+        //@TODO
+    }
+
+    public function testIs_serial() {
+        //@TODO
+    }
+
+    public function testGet_episode_details() {
+        //@TODO
+    }
+
+    // Finds outline in the itemprop="description" section nexto the poster
+    public function testPlotoutline() {
+        $imdb = $this->getImdb();
+        $this->assertEquals('A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.', $imdb->plotoutline());
+    }
+
+    public function testPlotoutline_strip_see_full_summary() {
+        $imdb = $this->getImdb('0284717');
+        $outline = $imdb->plotoutline();
+        $this->assertEquals(0, strpos($outline, 'Towards the end of the eleventh century, Pope Urban II announces a crusade against the Saracens, who have occupied the holy city of Jerusalem.'));
+        $this->assertFalse(stripos($outline, 'full summary'));
+    }
+
+    public function testPlotoutline_strip_see_full_synopsis() {
+        $imdb = $this->getImdb('0338187');
+        $outline = $imdb->plotoutline();
+        $this->assertEquals(0, strpos($outline, 'Lifelong friends Lenny (Dominic Chianese) and Ruben (Dick Latessa) are both in their 70s and dyed-in-the-wool New Yorkers...'));
+        $this->assertFalse(stripos($outline, 'See full synopsis'));
+    }
+
+    public function testPlotoutline_nooutline() {
+      $imdb = $this->getImdb('1027544');
+      $outline = $imdb->plotoutline();
+      $this->assertEquals('', $outline);
+    }
+
+    public function testStoryline() {
+        //@TODO
+    }
+
+    public function testPhoto_returns_false_if_no_poster() {
+        $imdb = $this->getImdb('1899250');
+        $this->assertFalse($imdb->photo(false));
+    }
+
+    public function testPhoto_thumb_returns_false_if_no_poster() {
+        $imdb = $this->getImdb('1899250');
+        $this->assertFalse($imdb->photo(true));
+    }
+
+    public function testPhoto() {
+        $imdb = $this->getImdb();
+        // This is a little brittle. What if the image changes? what if the size of the poster changes? ...
+        $this->assertEquals('http://ia.media-imdb.com/images/M/MV5BMTkxNDYxOTA4M15BMl5BanBnXkFtZTgwNTk0NzQxMTE@._V1', $imdb->photo(false));
+    }
+
+    public function testPhoto_thumb() {
+        $imdb = $this->getImdb();
+        // This is a little brittle. What if the image changes? what if the size of the poster changes? ...
+        $this->assertEquals('http://ia.media-imdb.com/images/M/MV5BMTkxNDYxOTA4M15BMl5BanBnXkFtZTgwNTk0NzQxMTE@._V1_SX214_AL_.jpg', $imdb->photo(true));
+    }
+
+    public function testSavephoto() {
+        $imdb = $this->getImdb();
+        @unlink(dirname(__FILE__).'/cache/poster.jpg');
+        $result = $imdb->savephoto(dirname(__FILE__).'/cache/poster.jpg');
+        $this->assertTrue($result);
+        $this->assertFileExists(dirname(__FILE__).'/cache/poster.jpg');
+        @unlink(dirname(__FILE__).'/cache/poster.jpg');
+    }
+
+    public function testPhoto_localurl() {
+        //@TODO
+    }
+
+    public function testMainPictures() {
+        //@TODO
+    }
+
+    public function testCountry() {
+        $imdb = $this->getImdb();
+        $this->assertEquals(array('USA', 'Australia'), $imdb->country());
+    }
+
+    public function testCountry_nocountries() {
+        //@TODO
+    }
+
+    public function testAlsoknow() {
+        $imdb = $this->getImdb("0087544");
+        $akas = $imdb->alsoknow();
+
+        // No country
+        $this->assertEquals('Kaze no tani no Naushika', $akas[0]['title']);
+        $this->assertEquals('original title', $akas[0]['comments'][0]);
+
+        //No country or comments (Should this really be included?)
+        $this->assertEquals('Kaze no tani no Nausicaa', $akas[1]['title']);
+        $this->assertEmpty($akas[2]['comments']);
+
+        // Country, no comment
+        $this->assertEquals('Nausicaä del Valle del Viento', $akas[2]['title']);
+        $this->assertEquals('Argentina', $akas[2]['country']);
+        $this->assertEmpty($akas[2]['comments']);
+
+        // Country with comment
+        $this->assertEquals('Наусика от Долината на вятъра', $akas[3]['title']);
+        $this->assertEquals('Bulgaria', $akas[3]['country']);
+        $this->assertEquals('Bulgarian title', $akas[3]['comments'][0]);
+
+        // Country with two comments
+        $this->assertEquals('Nausicaä - Aus dem Tal der Winde', $akas[5]['title']);
+        $this->assertEquals('Switzerland', $akas[5]['country']);
+        $this->assertEquals('DVD title', $akas[5]['comments'][0]);
+        $this->assertEquals('German title', $akas[5]['comments'][1]);
+    }
+
+    public function testAlsoknow_returns_no_results_when_film_has_no_akas() {
+      //@TODO
+    }
+
+    public function testSound_multiple_types() {
+      $imdb = $this->getImdb();
+      $sound = $imdb->sound();
+      $this->assertInternalType('array', $sound);
+      $this->assertCount(3, $sound);
+      $this->assertEquals('DTS', $sound[0]);
+      $this->assertEquals('Dolby Digital', $sound[1]);
+      $this->assertEquals('SDDS', $sound[2]);
+    }
+
+    public function testSound_one_type() {
+      $imdb = $this->getImdb('0087544');
+      $sound = $imdb->sound();
+      $this->assertInternalType('array', $sound);
+      $this->assertCount(1, $sound);
+      $this->assertEquals('Mono', $sound[0]);
+    }
+
+    public function testSound_none() {
+      $imdb = $this->getImdb('1027544');
+      $sound = $imdb->sound();
+      $this->assertInternalType('array', $sound);
+      $this->assertCount(0, $sound);
+    }
+
+    public function testMpaa() {
+        //@TODO
+    }
+
+    public function testMpaa_hist() {
+        //@TODO
+    }
+
+    public function testMpaa_reason() {
+        //@TODO
+    }
+
+    public function testProdNotes() {
+        //@TODO
+    }
+
+    public function testTop250() {
+        //@TODO
+    }
+
+    public function testPlot() {
+        //@TODO
+    }
+
+    public function testPlot_split() {
+        //@TODO
+    }
+
+    public function testSynopsis() {
+        //@TODO
+    }
+
+    public function testTaglines() {
+        //@TODO
+    }
+
+    public function testDirector_single() {
+        $imdb = $this->getImdb('0087544');
+        $this->assertEquals(array(
+                array('imdb' => '0594503',
+                    'name' => 'Hayao Miyazaki',
+                    'role' => null),
+            ),
+            $imdb->director());
+    }
+
+    public function testDirector_multiple() {
+        $imdb = $this->getImdb();
+        // Is the 'role' part correct?
+        $this->assertEquals(array(
+                array('imdb' => '0905152',
+                    'name' => 'Andy Wachowski',
+                    'role' => '(as The Wachowski Brothers)'),
+                array('imdb' => '0905154',
+                    'name' => 'Lana Wachowski',
+                    'role' => '(as The Wachowski Brothers)')
+            ),
+            $imdb->director());
+    }
+
+    public function testDirector() {
+        //@TODO this needs more tests for different scenarios
+    }
+
+    public function testCast_film_with_role_link() {
+      $imdb = $this->getImdb();
+      $cast = $imdb->cast();
+      $firstCast = $cast[0];
+      $this->assertEquals('0000206', $firstCast['imdb']);
+      $this->assertEquals('Keanu Reeves', $firstCast['name']);
+      $this->assertEquals('Neo', $firstCast['role']);
+      $this->assertTrue($firstCast['credited']);
+      $this->assertCount(0, $firstCast['role_other']);
+    }
+
+    public function testCast_film_with_role_link_and_as_name() {
+      $imdb = $this->getImdb();
+      $cast = $imdb->cast();
+      $castMember = $cast[14];
+      $this->assertEquals('0336802', $castMember['imdb']);
+      $this->assertEquals('Marc Aden Gray', $castMember['name']);
+      $this->assertEquals('Marc Gray', $castMember['name_alias']);
+      $this->assertEquals('Choi', $castMember['role']);
+      $this->assertTrue($castMember['credited']);
+      $this->assertCount(0, $castMember['role_other']);
+    }
+
+    public function testCast_film_no_role_link() {
+      $imdb = $this->getImdb();
+      $cast = $imdb->cast();
+      $castMember = $cast[16];
+      $this->assertEquals('0330139', $castMember['imdb']);
+      $this->assertEquals('Deni Gordon', $castMember['name']);
+      $this->assertEquals('Priestess', $castMember['role']);
+      $this->assertTrue($castMember['credited']);
+      $this->assertCount(0, $castMember['role_other']);
+    }
+
+    public function testCast_film_no_role_link_and_as_name() {
+      $imdb = $this->getImdb();
+      $cast = $imdb->cast();
+      $castMember = $cast[18];
+      $this->assertEquals('0936860', $castMember['imdb']);
+      $this->assertEquals('Eleanor Witt', $castMember['name']);
+      $this->assertEquals('Elenor Witt', $castMember['name_alias']);
+      $this->assertEquals('Potential', $castMember['role']);
+      $this->assertTrue($castMember['credited']);
+      $this->assertCount(0, $castMember['role_other']);
+    }
+
+    public function testCast_film_uncredited() {
+      $imdb = $this->getImdb();
+      $cast = $imdb->cast();
+      $castMember = $cast[36];
+      $this->assertEquals('1248119', $castMember['imdb']);
+      $this->assertEquals('Mike Duncan', $castMember['name']);
+      $this->assertEquals(null, $castMember['name_alias']);
+      $this->assertEquals('Twin', $castMember['role']);
+      $this->assertFalse($castMember['credited']);
+    }
+
+    public function testCast_film_as_name_and_brackets_in_role_name() {
+      $imdb = $this->getImdb('0416449');
+      $cast = $imdb->cast();
+      $castMember = $cast[19];
+      $this->assertEquals('2542697', $castMember['imdb']);
+      $this->assertEquals('Sebastian St. Germain', $castMember['name']);
+      $this->assertEquals('Sébastian St Germain', $castMember['name_alias']);
+      $this->assertEquals('Fighting Boy (12 years old)', $castMember['role']);
+      $this->assertTrue($castMember['credited']);
+      $this->assertInternalType('array', $castMember['role_other']);
+      $this->assertCount(0, $castMember['role_other']);
+    }
+
+    public function testCast_film_multiple_roles() {
+      $imdb = $this->getImdb('2015381');
+      $cast = $imdb->cast();
+      $castMember = $cast[13];
+      $this->assertEquals('0348231', $castMember['imdb']);
+      $this->assertEquals('Sean Gunn', $castMember['name']);
+      $this->assertEquals(null, $castMember['name_alias']);
+      $this->assertEquals('Kraglin / On Set Rocket', $castMember['role']);
+      $this->assertTrue($castMember['credited']);
+      $this->assertInternalType('array', $castMember['role_other']);
+      $this->assertCount(0, $castMember['role_other']);
+    }
+
+    public function testCast_film_uncredited_and_other() {
+      $imdb = $this->getImdb('2015381');
+      $cast = $imdb->cast();
+      $castMember = $cast[83];
+      $this->assertEquals('0001293', $castMember['imdb']);
+      $this->assertEquals('Seth Green', $castMember['name']);
+      $this->assertEquals(null, $castMember['name_alias']);
+      $this->assertEquals('Howard the Duck', $castMember['role']);
+      $this->assertFalse($castMember['credited']);
+      $this->assertInternalType('array', $castMember['role_other']);
+      $this->assertCount(1, $castMember['role_other']);
+      $this->assertEquals('voice', $castMember['role_other'][0]);
+    }
+
+    public function testCast_tv_episode_and_other_role_info() {
+      $imdb = $this->getImdb('0306414');
+      $cast = $imdb->cast();
+      $castMember = $cast[587];
+
+      $this->assertEquals('0000738', $castMember['imdb']);
+      $this->assertEquals('Muhammad Ali', $castMember['name']);
+      $this->assertFalse($castMember['credited']);
+      $this->assertEquals("Himself", $castMember['role']);
+      $this->assertEquals(1, $castMember['role_episodes']);
+      $this->assertEquals(2004, $castMember['role_start_year']);
+      $this->assertEquals(2004, $castMember['role_end_year']);
+      $this->assertInternalType('array', $castMember['role_other']);
+      $this->assertCount(1, $castMember['role_other']);
+      $this->assertEquals('archive footage', $castMember['role_other'][0]);
+    }
+
+    public function testCast_tv_multi_episode_multi_year() {
+        $imdb = $this->getImdb('0306414');
+        $cast = $imdb->cast();
+        $firstCast = $cast[0];
+
+        $this->assertEquals('0922035', $firstCast['imdb']);
+        $this->assertEquals('Dominic West', $firstCast['name']);
+        $this->assertEquals("Det. James 'Jimmy' McNulty", $firstCast['role']);
+        $this->assertEquals(60, $firstCast['role_episodes']);
+        $this->assertEquals(2002, $firstCast['role_start_year']);
+        $this->assertEquals(2008, $firstCast['role_end_year']);
+        $this->assertInternalType('array', $firstCast['role_other']);
+        $this->assertCount(0, $firstCast['role_other']);
+        $this->assertEquals('http://ia.media-imdb.com/images/M/MV5BMTY5NjQwNDY2OV5BMl5BanBnXkFtZTcwMjI2ODQ1MQ@@._V1_SY44_CR0,0,32,44_AL_.jpg', $firstCast['thumb']);
+        $this->assertEquals('http://ia.media-imdb.com/images/M/MV5BMTY5NjQwNDY2OV5BMl5BanBnXkFtZTcwMjI2ODQ1MQ@@.jpg', $firstCast['photo']);
+    }
+
+    public function testCast_tv_multi_episode_one_year() {
+        $imdb = $this->getImdb('0306414');
+        $cast = $imdb->cast();
+        $castMember = $cast[62];
+
+        $this->assertEquals('0430107', $castMember['imdb']);
+        $this->assertEquals('Michael B. Jordan', $castMember['name']);
+        $this->assertEquals("Wallace", $castMember['role']);
+        $this->assertEquals(13, $castMember['role_episodes']);
+        $this->assertEquals(2002, $castMember['role_start_year']);
+        $this->assertEquals(2002, $castMember['role_end_year']);
+        $this->assertInternalType('array', $castMember['role_other']);
+        $this->assertCount(0, $castMember['role_other']);
+    }
+
+    public function testCast_tv_one_episode_one_year() {
+        $imdb = $this->getImdb('0306414');
+        $cast = $imdb->cast();
+        $castMember = $cast[274];
+
+        $this->assertEquals('0661449', $castMember['imdb']);
+        $this->assertEquals('Neko Parham', $castMember['name']);
+        $this->assertEquals("State Police Undercover Troy Wiggins", $castMember['role']);
+        $this->assertEquals(1, $castMember['role_episodes']);
+        $this->assertEquals(2002, $castMember['role_start_year']);
+        $this->assertEquals(2002, $castMember['role_end_year']);
+        $this->assertInternalType('array', $castMember['role_other']);
+        $this->assertCount(0, $castMember['role_other']);
+    }
+
+    // @TODO Why keep the brackets?
+    public function testWriting_multiple_withrole() {
+        $imdb = $this->getImdb('0087544');
+        $this->assertEquals(array(
+                array('imdb' => '0594503',
+                    'name' => 'Hayao Miyazaki',
+                    'role' => '(comic)'),
+                array('imdb' => '0594503',
+                    'name' => 'Hayao Miyazaki',
+                    'role' => '(screenplay)')
+            ),
+            $imdb->writing());
+    }
+
+    public function testWriting() {
+        //@TODO more
+    }
+
+    public function testProducer() {
+        //@TODO
+    }
+    
+    // @TODO Stopped writing out tests for all functions here .. there are plenty more
+
+    public function testEpisodes_returns_nothing_for_a_film() {
+      $imdb = $this->getImdb();
+      $episodes = $imdb->episodes();
+      $this->assertInternalType('array', $episodes);
+      $this->assertEmpty($episodes);
+    }
+    
+    public function testEpisodes_returns_episodes_for_a_multiseason_show() {
+      $imdb = $this->getImdb('0306414');
+      $seasons = $imdb->episodes();
+      $this->assertInternalType('array', $seasons);
+      $this->assertCount(5, $seasons);
+      $episode1 = $seasons[1][1];
+      $lastEpisode = $seasons[5][10];
+
+      $this->assertEquals('0749451', $episode1['imdbid']);
+      $this->assertEquals('The Target', $episode1['title']);
+      $this->assertEquals('2 Jun. 2002', $episode1['airdate']);
+      $this->assertEquals("Baltimore Det. Jimmy McNulty finds himself in hot water with his superior Major William Rawls after a drug dealer, D'Angelo Barksdale who is charged with three murders, is acquitted. McNulty knows the judge in question and although it's not his case, he's called into chambers to explain what happened. Obviously key witnesses recanted their police statements on the stand but McNulty doesn't underplay Barksdale's role in at least 7 other murders. When the judge's raises his concerns at the senior levels of the police department, they have a new investigation on their ...", $episode1['plot']);
+      $this->assertEquals(1, $episode1['season']);
+      $this->assertEquals(1, $episode1['episode']);
+
+      $this->assertEquals('0977179', $lastEpisode['imdbid']);
+      $this->assertEquals('-30-', $lastEpisode['title']);
+      $this->assertEquals('9 Mar. 2008', $lastEpisode['airdate']);
+      $this->assertEquals("In the series finale, Carcetti maps out a damage-control scenario with the police brass in the wake of a startling revelation from Pearlman and Daniels. Their choice: clean up the mess...or hide the dirt.", $lastEpisode['plot']);
+      $this->assertEquals(5, $lastEpisode['season']);
+      $this->assertEquals(10, $lastEpisode['episode']);
+    }
+
+    public function testEpisodes_returns_episodes_for_a_multiseason_show_with_missing_airdates() {
+      $imdb = $this->getImdb('1027544');
+      $seasons = $imdb->episodes();
+      $this->assertInternalType('array', $seasons);
+      $this->assertCount(2, $seasons);
+      $episode = $seasons[1][2];
+
+      $this->assertEquals('1878585', $episode['imdbid']);
+      $this->assertEquals("Roary Slips Up", $episode['title']);
+      $this->assertEquals('', $episode['airdate']);
+      $this->assertEquals("", $episode['plot']);
+      $this->assertEquals(1, $episode['season']);
+      $this->assertEquals(2, $episode['episode']);
+    }
+
+    public function testEpisodes_returns_episodes_for_a_multiseason_show_with_empty_plots() {
+      $imdb = $this->getImdb('1027544');
+      $seasons = $imdb->episodes();
+      $this->assertInternalType('array', $seasons);
+      $this->assertCount(2, $seasons);
+      $episode = $seasons[1][1];
+
+      $this->assertEquals('1084805', $episode['imdbid']);
+      $this->assertEquals("Roary's First Day", $episode['title']);
+      $this->assertEquals('7 May 2007', $episode['airdate']);
+      $this->assertEquals("", $episode['plot']);
+      $this->assertEquals(1, $episode['season']);
+      $this->assertEquals(1, $episode['episode']);
+    }
+
+    // @TODO should it? this alters the imdb object to be the show rather than the episode .. could mess someone up
+    public function testEpisodes_works_for_an_episode() {
+
+    }
+
+    public function testGoofs() {
+      $imdb = $this->getImdb();
+
+      $goofs = $imdb->goofs();
+      $this->assertInternalType('array', $goofs);
+      $this->assertEquals(103, count($goofs));
+
+      $this->assertEquals('Audio/visual unsynchronised', $goofs[0]['type']);
+      $this->assertEquals('When Neo meets Trinity for the first time in the nightclub she is close to him talking in his ear. Even though she pauses between sentences the shot from the back of Trinity shows that her jaw is still moving during the pauses.', $goofs[0]['content']);
+
+      $this->assertEquals('Character error', $goofs[1]['type']);
+      $this->assertEquals("The doorknob at the Oracle's apartment is installed backwards. The screws are on the outside of the door, allowing a passer-by to take off the plate and remove the doorknob. Normally the screws would be on the inside to prevent this.", $goofs[1]['content']);
+
+      $this->assertEquals('Character error', $goofs[2]['type']);
+      $this->assertEquals('Morpheus specifies the human body generates 25,000 BTUs of body heat. The human body is constantly outputting heat into the environment so he should specify the rate of energy transfer rather than a total amount of energy being transferred. Or he should specify how much time it takes for a human body to output 25,000 BTUs in order for any claims, regarding how much energy is extracted from humans, to be meaningful.', $goofs[2]['content']);
+
+      $this->assertEquals('Revealing mistakes', $goofs[102]['type']);
+      $this->assertEquals("When Neo is being run through the agent training program with the woman in the red dress, Morpheus' sunglasses reflect Neo with a Desert Eagle pistol being held up by an Agent standing in an empty sound stage, not the busy city they're supposed to be in.", $goofs[102]['content']);
+    }
+
+    public function testSoundtrack_nosoundtracks() {
+        $imdb = $this->getImdb('0087544');
+        $result = $imdb->soundtrack();
+        $this->assertEmpty($result);
+    }
+
+    // This function doesn't really work very well
+    public function testSoundtrack_matrix() {
+        $imdb = $this->getImdb();
+        $result = $imdb->soundtrack();
+        $this->assertnotEmpty($result);
+        $this->assertEquals(12, count($result));
+
+        // fully check out the first result
+        // this might be a little tight, loosen this test if it fails incorrectly in the future
+        /* Dissolved Girl
+        Written by Robert del Naja, Grant Marshall (as Grantley Marshall), Mushroom Vowles (as Andrew Vowles),
+        Sara J., and Matt Schwartz
+        Performed by Massive Attack
+        Courtesy of Virgin Records LTD.
+        By Arrangement with Virgin Records America, Inc. */
+        $dg = $result[0];
+        $this->assertEquals('Dissolved Girl', $dg['soundtrack']);
+        // should be 5 writer credits, 1 performer, 1 courtesy and 1 arrangement
+//        $this->assertEquals(8, count($dg['credits']), "Incorrect number of credits");
+//        $this->assertEquals('writer', $dg['credits'][0]['desc']);
+//        $this->assertEquals('<a href="http://'.$imdb->imdbsite.'/name/nm1128020/?ref_=ttsnd_snd_1">Robert del Naja</a>', $dg['credits'][0]['credit_to']);
+    }
+
+    public function test_title_redirects_are_followed() {
+        $imdb = $this->getImdb('2768262');
+        $this->assertEquals('The Battle of the Sexes', $imdb->title());
+    }
+
+    public function testAwards_correctly_parses_an_entry_with_expandable_note() {
+      $imdb = $this->getImdb('0306414');
+      $awards = $imdb->awards();
+
+      $award = $awards['AFI Awards, USA'];
+      $firstEntry = $award['entries'][0];
+
+      $this->assertEquals(2009, $firstEntry['year']);
+      $this->assertEquals(true, $firstEntry['won']);
+      $this->assertEquals('TV Program of the Year', $firstEntry['category']);
+      $this->assertEquals('AFI Award', $firstEntry['award']);
+      $this->assertCount(0, $firstEntry['people']);
+      $this->assertEquals('Won', $firstEntry['outcome']);
+    }
+
+    public function testAwards_correctly_parses_an_entry_with_no_category_with_a_following_entry() {
+      $imdb = $this->getImdb('0306414');
+      $awards = $imdb->awards();
+
+      $award = $awards['Television Critics Association Awards'];
+      $firstEntry = $award['entries'][0];
+
+      $this->assertEquals(2008, $firstEntry['year']);
+      $this->assertEquals(true, $firstEntry['won']);
+      $this->assertEquals('', $firstEntry['category']);
+      $this->assertEquals('Heritage Award', $firstEntry['award']);
+      $this->assertCount(0, $firstEntry['people']);
+      $this->assertEquals('Won', $firstEntry['outcome']);
+    }
+
+    public function testAwards_correctly_parses_a_single_entry_award_with_one_person() {
+      $imdb = $this->getImdb();
+      $awards = $imdb->awards();
+
+      $ifmca = $awards['International Film Music Critics Award (IFMCA)'];
+      $firstEntry = $ifmca['entries'][0];
+
+      $this->assertEquals(1999, $firstEntry['year']);
+      $this->assertEquals(false, $firstEntry['won']);
+      $this->assertEquals('Film Score of the Year', $firstEntry['category']);
+      $this->assertEquals('FMCJ Award', $firstEntry['award']);
+      $this->assertCount(1, $firstEntry['people']);
+      $this->assertEquals('Don Davis', $firstEntry['people']['0204485']);
+      $this->assertEquals('Nominated', $firstEntry['outcome']);
+    }
+
+    public function testAwards_correctly_parses_a_single_entry_award_with_two_people() {
+      $imdb = $this->getImdb();
+      $awards = $imdb->awards();
+
+      $this->assertCount(34, $awards);
+
+      $scifiWritersAward = $awards['Science Fiction and Fantasy Writers of America'];
+      $firstEntry = $scifiWritersAward['entries'][0];
+
+      $this->assertEquals(2000, $firstEntry['year']);
+      $this->assertEquals(false, $firstEntry['won']);
+      $this->assertEquals('Best Script', $firstEntry['category']);
+      $this->assertEquals('Nebula Award', $firstEntry['award']);
+      $this->assertCount(2, $firstEntry['people']);
+      $this->assertEquals('Lana Wachowski', $firstEntry['people']['0905154']);
+      $this->assertEquals('Andy Wachowski', $firstEntry['people']['0905152']);
+      $this->assertEquals('Nominated', $firstEntry['outcome']);
+    }
+
+    public function testAwards_correctly_parses_a_multi_entry_award() {
+      $imdb = $this->getImdb();
+      $awards = $imdb->awards();
+
+      $award = $awards['Online Film & Television Association'];
+
+      $this->assertCount(5, $award['entries']);
+
+      $firstEntry = $award['entries'][0];
+
+      $this->assertEquals(2000, $firstEntry['year']);
+      $this->assertEquals(true, $firstEntry['won']);
+      $this->assertEquals('Best Sound Mixing', $firstEntry['category']);
+      $this->assertEquals('OFTA Film Award', $firstEntry['award']);
+      $this->assertCount(4, $firstEntry['people']);
+      $this->assertEquals('John T. Reitz', $firstEntry['people']['0718676']);
+      $this->assertEquals('Gregg Rudloff', $firstEntry['people']['0748832']);
+      $this->assertEquals('David E. Campbell', $firstEntry['people']['0132372']);
+      $this->assertEquals('David Lee Fein', $firstEntry['people']['0270646']);
+      $this->assertEquals('Won', $firstEntry['outcome']);
+
+      $secondEntry = $award['entries'][1];
+
+      $this->assertEquals(2000, $secondEntry['year']);
+      $this->assertEquals(true, $secondEntry['won']);
+      $this->assertEquals('Best Visual Effects', $secondEntry['category']);
+      $this->assertEquals('OFTA Film Award', $secondEntry['award']);
+      $this->assertCount(4, $secondEntry['people']);
+      $this->assertEquals('John Gaeta', $secondEntry['people']['0300665']);
+      $this->assertEquals('Janek Sirrs', $secondEntry['people']['0802938']);
+      $this->assertEquals('Steve Courtley', $secondEntry['people']['0183871']);
+      $this->assertEquals('Jon Thum', $secondEntry['people']['0862039']);
+      $this->assertEquals('Won', $secondEntry['outcome']);
+    }
+
+    public function testAwards_correctly_parses_an_entry_with_no_people() {
+      $imdb = $this->getImdb();
+      $awards = $imdb->awards();
+
+      $award = $awards['Online Film & Television Association'];
+
+      $this->assertCount(5, $award['entries']);
+
+      $fifthEntry = $award['entries'][4];
+
+      $this->assertEquals(2000, $fifthEntry['year']);
+      $this->assertEquals(false, $fifthEntry['won']);
+      $this->assertEquals('Best Official Film Website', $fifthEntry['category']);
+      $this->assertEquals('OFTA Film Award', $fifthEntry['award']);
+      $this->assertCount(0, $fifthEntry['people']);
+      $this->assertEquals('Nominated', $fifthEntry['outcome']);
+    }
+
+    public function testAwards_correctly_parses_an_entry_with_no_category_or_people() {
+      $imdb = $this->getImdb();
+      $awards = $imdb->awards();
+
+      $award = $awards['National Film Preservation Board, USA'];
+
+      $this->assertCount(1, $award['entries']);
+
+      $firstEntry = $award['entries'][0];
+
+      $this->assertEquals(2012, $firstEntry['year']);
+      $this->assertEquals(true, $firstEntry['won']);
+      $this->assertEquals('', $firstEntry['category']);
+      $this->assertEquals('National Film Registry', $firstEntry['award']);
+      $this->assertCount(0, $firstEntry['people']);
+      $this->assertEquals('Won', $firstEntry['outcome']);
+    }
+
+    public function testAwards_correctly_parses_an_entry_where_people_have_role_descriptions() {
+      $imdb = $this->getImdb();
+      $awards = $imdb->awards();
+
+      $award = $awards['Motion Picture Sound Editors, USA'];
+
+      $this->assertCount(3, $award['entries']);
+
+      $thirdEntry = $award['entries'][2];
+
+      $this->assertEquals(2000, $thirdEntry['year']);
+      $this->assertEquals(false, $thirdEntry['won']);
+      $this->assertEquals('Best Sound Editing - Music (Foreign & Domestic)', $thirdEntry['category']);
+      $this->assertEquals('Golden Reel Award', $thirdEntry['award']);
+      $this->assertCount(3, $thirdEntry['people']);
+      $this->assertEquals('Lori L. Eschler', $thirdEntry['people']['0002669']);
+      $this->assertEquals('Zigmund Gron', $thirdEntry['people']['0343065']);
+      $this->assertEquals('Jordan Corngold', $thirdEntry['people']['0180383']);
+      $this->assertEquals('Nominated', $thirdEntry['outcome']);
+    }
+
+    public function testAwards_correctly_parses_an_entry_with_no_category_name() {
+      $imdb = $this->getImdb();
+      $awards = $imdb->awards();
+
+      $award = $awards['BMI Film & TV Awards'];
+
+      $this->assertCount(1, $award['entries']);
+
+      $firstEntry = $award['entries'][0];
+
+      $this->assertEquals(1999, $firstEntry['year']);
+      $this->assertEquals(true, $firstEntry['won']);
+      $this->assertEquals('', $firstEntry['category']);
+      $this->assertEquals('BMI Film Music Award', $firstEntry['award']);
+      $this->assertCount(1, $firstEntry['people']);
+      $this->assertEquals('Don Davis', $firstEntry['people']['0204485']);
+      $this->assertEquals('Won', $firstEntry['outcome']);
+    }
+    
+    /**
+     * Create an imdb object that uses cached pages
+     * The matrix by default
+     * @return \imdb
+     */
+    protected function getImdb($imdbId = '0133093') {
+        $config = new mdb_config();
+        $config->language = 'En';
+        $config->cachedir = realpath(dirname(__FILE__).'/cache') . '/';
+        $config->usezip = false;
+        $config->cache_expire = 3600;
+        $config->debug = false;
+        $imdb = new imdb($imdbId, $config);
+        return $imdb;
+    }
+}
