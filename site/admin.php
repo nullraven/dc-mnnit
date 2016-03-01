@@ -90,7 +90,7 @@ if(!isset($_SESSION['admin']))
 				$_SESSION['admin']=1;
 				$_SESSION['status']=htmlentities($pwd['status']);
 				/*echo '<script>alert("Logged in Succesfully");</script>';*/
-				palert("Login success!","admin.php");
+				header("location:admin.php");
 			}
 			else 
 			{
@@ -152,7 +152,7 @@ else{
         <!--<tr >--><th>Category</th><th>Name</th><th>Status</th><th>Magnet Link</th><th width="5px">Change</th></thead><tbody>
         <?php
 		
-        $requestq="select * from dcrequests where status in ('Pending','Invalid Request') or (status like 'Downloading' and fulfilledby like '".htmlentities($_SESSION['user'])."') order by timeofreq desc";
+        $requestq="select * from dcrequests where status in ('Pending','Invalid Request') or (status like 'Downloading' and fulfilledby like '".($_SESSION['user'])."') order by timeofreq desc";
 		//echo $requestq;
         $res=$con->query($requestq) or die($con->error);
 		$star=array('Pending','Downloading','Fulfilled','Already Present','Invalid Request');
@@ -165,7 +165,7 @@ else{
 				$selbox.='<option value="'.$i.'" '.$sl.'>'.$i.'</option>';
 			}
 			$st.='</select>';
-            echo "<tr><td>$req[category]</td><td>$req[name] ".($reg['torrent_link']?"<a href='' taget='_blank'>Torrent link</a>":"")."</td><td class='tdsel'>$selbox</td><td><input type='text' id='mag_".$req['id']."' class='form-control' value='".$req['link']."' disabled/></td><td><button type='submit' class='btn btn-success' onclick='fun1(".$req['id'].")'><span class='glyphicon glyphicon-check'></span></button></td></tr>";
+            echo "<tr><td>$req[category]</td><td>".($req['torrent_link']?"<a href='".$req['torrent_link']."' target='_blank'>$req[name]</a>":"$req[name]")."</td><td class='tdsel'>$selbox</td><td><input type='text' id='mag_".$req['id']."' class='form-control' value='".$req['link']."' disabled/></td><td><button type='submit' class='btn btn-success' onclick='fun1(".$req['id'].")'><span class='glyphicon glyphicon-check'></span></button></td></tr>";
         }
         ?></tbody>
         </table>

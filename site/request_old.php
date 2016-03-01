@@ -1,5 +1,6 @@
 
 <?php
+	header('location:request.php');
 	require_once("../include/function.php");
 ?>
 
@@ -105,7 +106,7 @@ if(isset($_POST['submit'])){
 	<table class="table  table-striped table-bordered table-hover" >
 	<tr style="background-color:#EEE;color:#000"><th>Category</th><th>Name</th><th>Status</th></tr>
 	<?php
-	$requestq="select * from dcrequests where 1 order by timeofreq desc";
+	$requestq="select * from dcrequests where status!='r' order by timeofreq desc";
 	$res=$mysqli->query($requestq);
 	while($req=$res->fetch_array()){
 		echo "<tr><td>$req[category]</td><td>$req[name]";

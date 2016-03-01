@@ -57,12 +57,18 @@ while($row=$res->fetch_array())
 	$stat=$row['status'];
 	$olcount=$row['olcount'];
 	$totcount=$row['totcount'];
-	$cqry="select count(*) from dcrequests where fulfilledby in(select user from in_hub where hub like '$name' ) and status in ('Downloading','Fulfilled','Already Present')";
-	$cres=$con->query($cqry) or die("Server facing technical problems... :(");
-	if($cres=$cres->fetch_array())
-		$cnt=$cres[0];
+	$cqry="select count(*) from dcrequests where fulfilledby in(select user from in_hub where hub like ? ) and status in ('Downloading','Fulfilled','Already Present')";
+	$stmt=$con->prepare($cqry);
+	$stmt->bind_param("s",$name);
+	$stmt->execute() or die("Server facing technical problems... :(");
+	
+	$stmt->bind_result($cnt);
+	if($stmt->fetch())
+		$cnt=$cnt;
 	else 
 		$cnt=0;
+		
+	$stmt->close();
 	if($stat=="ONLINE")
 	{
 		$sp="<span class=\"glyphicon glyphicon-signal\"></span>";

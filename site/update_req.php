@@ -14,7 +14,7 @@ $con=dbconnect();
 	//foreach($_POST as $a=>$b)
 	//	$_POST[$a]=validate($b);
 	$rid=$_POST['rid'];
-	$admin=htmlentities($_SESSION['user']);
+	$admin=$_SESSION['user'];
 	$stat=$_POST['stat'];
 	$link=$_POST['lnk']?$_POST['lnk']:null;
 	if(in_array($stat,array("Fulfilled","Already Present")) && empty($link)){

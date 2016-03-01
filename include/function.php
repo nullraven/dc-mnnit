@@ -104,7 +104,7 @@ function getHeader($page)
       	<li <?= $page=="proxy.php"?"class=\"active\"":"";?>><a href="proxy.php"><span class="glyphicon glyphicon-globe"></span> Working Proxies<sup> &beta;</sup></a></li>
       	
           <li <?= $page=="addhub.php"?"class=\"active\"":"";?>><a href="addhub.php"><span class="glyphicon glyphicon-plus-sign"></span> Add new HUB</a></li>
-      	  <li <?= $page=="request.php"?"class=\"active\"":"";?>><a href="request_old.php"><span class="glyphicon glyphicon-cloud-download"></span> Request File</a></li>
+      	  <li <?= $page=="request.php"?"class=\"active\"":"";?>><a href="request.php"><span class="glyphicon glyphicon-cloud-download"></span> Request File</a></li>
       	<li <?= $page=="info.php"?"class=\"active\"":"";?>><a href="info.php"><span class="glyphicon glyphicon-info-sign"></span> Info<!--<img src="new.gif" />--></a></li>
       	
       </ul>

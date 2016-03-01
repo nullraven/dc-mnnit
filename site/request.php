@@ -109,6 +109,8 @@ function fun3(cat)
     });
 }
 
+
+
 </script>
 <body>
 <?php
@@ -120,10 +122,10 @@ getHeader("request.php");
 foreach($_GET as $a=>$b)
 	$_GET[$a]=validate($b);*/
 
-if(isset($_POST['submit'])){
+if(isset($_POST['submit'])){	// request query submitted
 	$errval=0;
 	$name=$_POST['inames'];
-	if(!isset($_POST['inames'])|| empty($_POST['inames']) ||!isset($_POST['category'])|| empty($_POST['category'])){
+	if(!isset($_POST['inames'])|| empty($_POST['inames']) ||!isset($_POST['category'])|| empty($_POST['category'])){	//a field is empty...
 			//error message
 			$errmsg="Invalid Response";
 			$errval++;
@@ -137,7 +139,8 @@ if(isset($_POST['submit'])){
 		$errmsg="Category cannot be more that 20 characters";
 		$errval++;
 	}
-	else {
+	
+	else {		
 		$chkq="select id from dcrequests where name like ?";// and category like '$_POST[category]'
 		$stmt=$mysqli->prepare($chkq);
 		$stmt->bind_param('s',$name);
@@ -147,14 +150,14 @@ if(isset($_POST['submit'])){
 		if($stmt->fetch()){
 			
 			$errval++;
-			$errmsg="Request already exist!!!";
+			$errmsg="Request already exists!";
 		}
 		else {
-			$insertq="INSERT INTO dcrequests (`category`, `name`, `status`,`ip`) VALUES (?, ?,'Pending',?);";
+			$insertq="INSERT INTO dcrequests (`category`, `name`, `status`,`ip`,`torrent_link`) VALUES (?, ?,'Pending',?,?);";
 			$stmt=$mysqli->prepare($insertq);
 			$ip=getIP();
-			$ip=$ip?$ip:'?.?.?.?';
-			$stmt->bind_param('sss',$_POST['category'],$_POST['inames'],$ip);
+			$ip=$ip?$ip:'?.?.?.?';	//no ip found?
+			$stmt->bind_param('ssss',$_POST['category'],$_POST['inames'],$ip,$_POST['tlink']);
 			$stmt->execute();
 		}
 		
@@ -207,7 +210,7 @@ if(isset($_POST['submit'])){
 </div>
 
 <div class="form-group">
-  <label class="col-md-4 control-label" for="inames">Torrent Link</label>  
+  <label class="col-md-4 control-label" for="inames">Link</label>  
   <div class="col-md-6">
   <input name="tlink" class="form-control input-md" placeholder="(optional)">
   </div>
@@ -266,30 +269,39 @@ if(isset($_POST['submit'])){
         </div>
   </div>
 </form>
+
 <!-------------------------------------------------filters end--------------------------------------------------------------->
 
 <div id="requesteditem" class="col-lg-10 col-lg-offset-1" style="margin-bottom:50px;">
-	<table  class=" col-md-10 table  table-striped table-bordered table-hover tablesorter" id="reqtab" style="border-radius:5px 5px 0 0">
-	<thead style="background-color:#203D77;color:#fff;"><th>Category</th><th width="65%">Name</th><th>Status</th></thead>
+	<table  class=" col-md-10 table  table-striped table-bordered table-hover table-condensed tablesorter" id="reqtab" style="border-radius:5px 5px 0 0">
+	<thead style="background-color:#203D77;color:#fff;"><th>Category</th><th>Name</th><th>Status</th></thead>
     <tbody>
 	<?php
 	 $where_cat="'".implode("','",$_SESSION['filters']['category'])."'";
 	 $where_status="'".implode("','",$_SESSION['filters']['status'])."'";
 	
-	$qry="select count(*) from dcrequests where status!='r' and category in ($where_cat) and status in ($where_status)";
+	$qry="select count(*) as cnt from dcrequests where status!='r' and category in ($where_cat) and status in ($where_status) ";
 	$res=$mysqli->query($qry) or die ("Error counting entries"); 
-	$pgcnt=$res->fetch_array();
-	$pgcnt=$pgcnt[0];
+	$entries_cnt=$res->fetch_array();
+	$entries_cnt=$entries_cnt[0];
+	
 	$pg=intval($_REQUEST['pg']);
 	$showperpg=intval($_REQUEST['showperpg']);
 	
 	if(!$showperpg) $showperpg=25;	//default 25 entries/page
 	
-	$pgcnt=max(array(1,$pgcnt));
-	if(!$pg||$pg<=0||$pg>=$pgcnt) $pg=1;
+	$max_pgs=floor($entries_cnt/$showperpg)+1;
+	$entries_cnt=max(array(1,$entries_cnt));
+	
+	//page index must be within limits
+	if(!$pg||$pg<=0) 
+		$pg=1;
+	else if($pg>$max_pgs) 
+		$pg=$max_pgs;
 	
 	
-	$l1=($pg*$showperpg)  % $pgcnt;
+	$l1=(($pg-1)*$showperpg);	//base index of row
+	
 	//$datasrch="<datalist id='show_req'>";
 	$requestq="select * from dcrequests where status!='r' and category in ($where_cat) and status in ($where_status) order by timeofreq desc limit $l1,$showperpg";
 	$res=$mysqli->query($requestq) or die($mysqli->error);
@@ -297,7 +309,7 @@ if(isset($_POST['submit'])){
 		//$datasrch.="<option value='$req[name]'></option>";
 		echo "<tr id='$req[id]'><td class=\"col-md-2\">$req[category]</td><td class=\"col-md-6\">";
 		if(!empty($req['torrent_link'])) 
-			echo "<a href='$req[torrent_link]'>$req[name]</a>";
+			echo "<a href='$req[torrent_link]' target='_blank'>$req[name]</a>";
 		else 
 			echo $req['name'];
 		if(!empty($req['link'])){
@@ -314,28 +326,39 @@ if(isset($_POST['submit'])){
 	</tbody></table>
     
     <nav class="col-sm-12 col-sm-offset-0" style="text-align:center">
-      <ul class="pagination pagination-sm">
-        <li>
-          <a href="request.php?pg=<?=abs($pg-1)?>&showperpg=<?=$showperpg?>" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-        </li>
-        <?php
-		$t=0;
-		while(($t*$showperpg)<=$pgcnt){
-		if($pg==$t)
-			echo '<li class="active"><a href="request.php?pg='.$t.'&showperpg='.$showperpg.'">'.($t+1).'</a></li>';	
-		else
-        	echo '<li><a href="request.php?pg='.$t.'&showperpg='.$showperpg.'">'.($t+1).'</a></li>';
-		$t++;
-		}
-		?>
-        <li>
-          <a href="request.php?pg=<?=($pg+1)?>&showperpg=<?=$showperpg?>" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-          </a>
-        </li>
-      </ul>
+    	<div class="col-sm-10">
+          <ul class="pagination pagination-sm">
+            <li>
+              <a href="request.php?pg=<?=abs($pg-1)?>&showperpg=<?=$showperpg?>" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <?php
+            for($t=1;$t<=$max_pgs;$t++){
+            if($pg==$t)
+                echo '<li class="active"><a href="request.php?pg='.$t.'&showperpg='.$showperpg.'">'.$t.'</a></li>';	
+            else
+                echo '<li><a href="request.php?pg='.$t.'&showperpg='.$showperpg.'">'.$t.'</a></li>';
+            }
+            ?>
+            <li>
+              <a href="request.php?pg=<?=($pg+1)?>&showperpg=<?=$showperpg?>" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+      </div>
+      <div class="col-sm-2">
+            	Show 
+                    <select id="showperpg" onChange="set_showperpg()" >
+                    	<option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="75">75</option>
+                        <option value="100">100</option>
+                    </select>
+               entries 
+      </div>
     </nav>
 </div>
 <br>
@@ -347,4 +370,16 @@ if(isset($_POST['submit'])){
 echo "<datalist id='show_req'></datalist>";
 getFooter(); ?>
 </body>
+
+<script>
+$(document).ready(function(e) {
+    $("#showperpg option[value=<?=$showperpg?>]").prop('selected','selected');
+});
+function set_showperpg(){
+	spp=$("#showperpg").val();
+	console.log(window.location.href+"?pg=<?=$pg?>&showperpg="+spp);
+	window.location.href="<?=parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH)?>?pg=<?=$pg?>&showperpg="+spp;
+}
+</script>
+
 </html>
