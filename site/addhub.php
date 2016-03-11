@@ -199,7 +199,7 @@ if(isset($errval)){
   <label class="col-md-4 control-label" for="ownername">hub Owner Name</label>  
   <div class="col-md-5">
   <input id="ownername" name="ownername" type="text" placeholder="Name" class="form-control input-md">
-  <span class="help-block">This name will not be revealed</span>  
+  <span class="help-block">This name will not be revealed</span>
   </div>
 </div>
 <!-- Text input-->
@@ -207,7 +207,7 @@ if(isset($errval)){
   <label class="col-md-4 control-label" for="uname">userName</label>  
   <div class="col-md-5">
   <input id="uname" name="uname" type="text" placeholder="username" class="form-control input-md">
-  <span class="help-block">This name will not be revealed. For managing purpose</span>  
+  <span class="help-block">This name will be revealed, for fulfilling requests</span>
   </div>
 </div>
 <!-- Text input-->

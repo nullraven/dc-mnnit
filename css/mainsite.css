@@ -20,6 +20,12 @@ body
 #footr{
 	margin-bottom:-10px;
 }
+
+@media screen and (max-width:800px) {
+	#footr{
+		display: none;
+	}
+}
 /*___________________________________________________-----------------------Proxy graphs----------------------------__________________________________*/
 #outerpredictor{
 	position:fixed;
@@ -50,7 +56,7 @@ body
 	cursor:pointer;
 	line-height:30px;
 	text-align:center;
-	font:"Comic Sans MS", cursive;
+	font-family:"Comic Sans MS";
 	color:#fff;
 	background-color:#F00;
 	font-weight:bold;
