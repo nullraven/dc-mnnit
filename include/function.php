@@ -96,26 +96,26 @@ function getHeader($page)
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-      <a class="navbar-brand" href="index.php">MNNIT DC</a>
+      <a class="navbar-brand" href="<?=CONST_SITE_URL?>/index">MNNIT DC</a>
 </div>
 <div class="collapse navbar-collapse navbarCollapse">
       <ul id="menu" class="nav navbar-nav ">
-        <li <?= $page=="index.php"?"class=\"active\"":"";?>><a href="index.php"><span class="glyphicon glyphicon-list-alt"></span> HUBS Status</a></li>
-      	<li <?= $page=="proxy.php"?"class=\"active\"":"";?>><a href="proxy.php"><span class="glyphicon glyphicon-globe"></span> Working Proxies<sup> &beta;</sup></a></li>
+        <li <?= $page=="index.php"?"class=\"active\"":"";?>><a href="<?=CONST_SITE_URL?>/index"><span class="glyphicon glyphicon-list-alt"></span> HUBS Status</a></li>
+      	<li <?= $page=="proxy.php"?"class=\"active\"":"";?>><a href="<?=CONST_SITE_URL?>/proxy"><span class="glyphicon glyphicon-globe"></span> Working Proxies<sup> &beta;</sup></a></li>
       	
-          <li <?= $page=="addhub.php"?"class=\"active\"":"";?>><a href="addhub.php"><span class="glyphicon glyphicon-plus-sign"></span> Add new HUB</a></li>
-      	  <li <?= $page=="request.php"?"class=\"active\"":"";?>><a href="request.php"><span class="glyphicon glyphicon-cloud-download"></span> Request File</a></li>
-      	<li <?= $page=="info.php"?"class=\"active\"":"";?>><a href="info.php"><span class="glyphicon glyphicon-info-sign"></span> Info<!--<img src="new.gif" />--></a></li>
+          <li <?= $page=="addhub.php"?"class=\"active\"":"";?>><a href="<?=CONST_SITE_URL?>/addhub"><span class="glyphicon glyphicon-plus-sign"></span> Add new HUB</a></li>
+      	  <li <?= $page=="request.php"?"class=\"active\"":"";?>><a href="<?=CONST_SITE_URL?>/request"><span class="glyphicon glyphicon-cloud-download"></span> Request File</a></li>
+      	<li <?= $page=="info.php"?"class=\"active\"":"";?>><a href="info"><span class="glyphicon glyphicon-info-sign"></span> Info<!--<img src="new.gif" />--></a></li>
       	
       </ul>
       <ul class="nav navbar-nav navbar-right" style="margin-right:10px;">
       <?php if(isset($_SESSION['admin'])){
 	  	?>
-        <li <?= $page=="admin.php"?"class=\"active\"":"";?>><a href="admin.php"><span class="glyphicon glyphicon-user"></span> <?php echo $_SESSION['user']; ?></a></li>
-      <li <?= $page=="logout.php"?"class=\"active\"":"";?>><a href="logout.php"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+        <li <?= $page=="admin.php"?"class=\"active\"":"";?>><a href="<?=CONST_SITE_URL?>/admin"><span class="glyphicon glyphicon-user"></span> <?php echo $_SESSION['user']; ?></a></li>
+      <li <?= $page=="logout.php"?"class=\"active\"":"";?>><a href="<?=CONST_SITE_URL?>/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
       <?php } else { ?>
-      <li ><p class="navbar-text"><a href="admin.php"><?=isset($_SESSION['user'])?$_SESSION['user']:'' ?> </a></p></li>
-      <li <?= $page=="admin.php"?"class=\"active\"":"";?>><a href="admin.php"><span class="glyphicon glyphicon-user"></span> Hub Admin</a></li>
+      <li ><p class="navbar-text"><a href="<?=CONST_SITE_URL?>/admin.php"><?=isset($_SESSION['user'])?$_SESSION['user']:'' ?> </a></p></li>
+      <li <?= $page=="admin.php"?"class=\"active\"":"";?>><a href="<?=CONST_SITE_URL?>/admin"><span class="glyphicon glyphicon-user"></span> Hub Admin</a></li>
       <?php } ?>
       </ul>
     </div>

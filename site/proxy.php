@@ -112,11 +112,7 @@ getHeader("proxy.php");
 			while($avg_rr=$avg_r->fetch_array())
 			{
 				//echo "<tr><td>$avg_rr[0]</td><td>$avg_rr[1]</td></tr>";
-				if($avg_rr[0]>(13*1024.0))
-				{
-					$avg_rr[0]=rand(0,100);
-
-				}
+				
 				$speed_ar[$addr][$i]=intval($avg_rr[0]);
 				$tim_ar[$addr][$i++]=sprintf("%02s",$avg_rr[1]).":".sprintf("%02s",$avg_rr[2]);
 			}

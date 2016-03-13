@@ -27,6 +27,7 @@ getHeader("info.php");
 		<li><!--<img src="new.gif" />-->All 'Invalid Requests' will be deleted after 24 hours unless changed by any Hub Admin</li>
 		<li> pm suggestions/reviews...constuctive/destructive... to -Bloodraven- on DC++ ;) <!--<img src="new.gif" />--></li>
 		<li>This project is Open Source. Please feel free to contribute or post issues. <a href="https://github.com/nullraven/dc-mnnit" target="_blank">Github Link</a></li>
+        <li>Developers feel free to use JSON for proxy <a href="<?=CONST_SITE_URL?>/api/proxy">here</a> :D</li>
 
 	</ul>
 

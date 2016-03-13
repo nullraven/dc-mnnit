@@ -96,7 +96,7 @@ if(!isset($_SESSION['admin']))
 				$_SESSION['admin']=1;
 				$_SESSION['status']=$status;
 				echo '<script>bootbox.alert("Logged in Succesfully");</script>';
-				echo '<script>window.location.href="admin.php"</script>';
+				echo '<script>window.location.href="admin"</script>';
 			}
 			else 
 			{
