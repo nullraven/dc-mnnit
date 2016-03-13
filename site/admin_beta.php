@@ -18,13 +18,10 @@ function fun1(sid)
 {
 	var st=document.getElementById('stat_'+sid).value;
 	var magnet=document.getElementById('mag_'+sid).value;
-	bootbox.confirm('Are you sure you want to do this?',function(result){
-		if(result)
-		$.post('update_req.php',{rid:sid,stat:st,lnk:magnet},function(data){
-			bootbox.alert(data);
-		});
+	if(confirm('Are you sure you want to do this?'))
+	$.post('update_req.php',{rid:sid,stat:st,lnk:magnet},function(data){
+		alert(data);	
 	});
-
 }
 function fun2(sid)
 {
@@ -81,31 +78,29 @@ getHeader("admin.php");
 if(!isset($_SESSION['admin']))
 {
 	if(isset($_POST['user']) && isset($_POST['pass'])){
-		$user=trim(htmlentities($_POST['user']));
-		$pass=trim($_POST['pass']);
-		$logqry="select passw,status from admin where usr=?";
-		$stmt=$con->prepare($logqry);
-		$stmt->bind_param("s",$user);
-		$stmt->execute();
-		$stmt->bind_result($passw,$status);
-		if($stmt->fetch())
+		$user=trim($con->real_escape_string(htmlentities($_POST['user'])));
+		$pass=trim($con->real_escape_string(htmlentities($_POST['pass'])));
+		$logqry="select passw,status from admin where usr='".$user."'";
+		$res=$con->query($logqry);
+		if($pwd=$res->fetch_array())
 		{
-			if($passw==$pass)
+			if($pwd['passw']==$pass)
 			{
 				$_SESSION['user']=$_POST['user'];
 				$_SESSION['admin']=1;
-				$_SESSION['status']=$status;
-				echo '<script>bootbox.alert("Logged in Succesfully");</script>';
-				echo '<script>window.location.href="admin.php"</script>';
+				$_SESSION['status']=htmlentities($pwd['status']);
+				/*echo '<script>alert("Logged in Succesfully");</script>';*/
+				header("location:admin.php");
 			}
 			else 
 			{
-				echo '<script>bootbox.alert("Invalid username or password!");</script>';
+				echo '<script>alert("Invalid Username or password!");</script>';
+				//header('location:admin.php');
 			}
 		}
 	else
 		{
-			echo '<script>bootbox.alert("Invalid username or password!");</script>';
+			echo '<script>alert("Invalid Username or password!");</script>';
 			//header('location:admin.php');
 		}
 	}
@@ -170,7 +165,7 @@ else{
 				$selbox.='<option value="'.$i.'" '.$sl.'>'.$i.'</option>';
 			}
 			$st.='</select>';
-            echo "<tr><td>$req[category]</td><td>".($req['torrent_link']?"<a href='".$req['torrent_link']."' target='_blank'>$req[name]</a>":"$req[name]")."</td><td class='tdsel'>$selbox</td><td><input type='text' id='mag_".$req['id']."' class='form-control' value='".$req['link']."' disabled/></td><td><button type='submit' class='btn btn-success' onclick='fun1(".$req['id'].")'><span class='glyphicon glyphicon-check'></span></button></td></tr>";
+            echo "<tr><td>$req[category]</td><td>$req[name] ".($reg['torrent_link']?"<a href='' taget='_blank'>Torrent link</a>":"")."</td><td class='tdsel'>$selbox</td><td><input type='text' id='mag_".$req['id']."' class='form-control' value='".$req['link']."' disabled/></td><td><button type='submit' class='btn btn-success' onclick='fun1(".$req['id'].")'><span class='glyphicon glyphicon-check'></span></button></td></tr>";
         }
         ?></tbody>
         </table>

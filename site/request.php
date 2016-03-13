@@ -26,6 +26,9 @@
 label.no-styl{
 	font-weight:normal;
 }
+	.modal-dialog{
+		max-width: 60vw;;
+	}
 </style>
 
 <script type="text/javascript">
@@ -284,18 +287,18 @@ if(isset($_POST['submit'])){	// request query submitted
 	$res=$mysqli->query($qry) or die ("Error counting entries"); 
 	$entries_cnt=$res->fetch_array();
 	$entries_cnt=$entries_cnt[0];
-	
-	$pg=intval($_REQUEST['pg']);
-	$showperpg=intval($_REQUEST['showperpg']);
-	
-	if(!$showperpg) $showperpg=25;	//default 25 entries/page
-	
+
+	$pg=isset($_REQUEST['pg'])?intval($_REQUEST['pg']):1;
+	$showperpg=isset($_REQUEST['showperpg'])?intval($_REQUEST['showperpg']):25;
+
 	$max_pgs=floor($entries_cnt/$showperpg)+1;
 	$entries_cnt=max(array(1,$entries_cnt));
 	
 	//page index must be within limits
-	if(!$pg||$pg<=0) 
+	if($pg<=0)
 		$pg=1;
+	if($showperpg<=0)
+		$showperpg=25;
 	else if($pg>$max_pgs) 
 		$pg=$max_pgs;
 	
@@ -374,6 +377,15 @@ getFooter(); ?>
 <script>
 $(document).ready(function(e) {
     $("#showperpg option[value=<?=$showperpg?>]").prop('selected','selected');
+	<?php
+		if(!isset($_COOKIE['dcp_dialog_shown'])||!$_COOKIE['dcp_dialog_shown']){
+	?>
+		bootbox.alert('<ul><li>This is a place where you add requests, and hub admins try to fulfil them</li><li>Please <b style="color: red">SEARCH</b> for the file in both DC++ (all <a href="index.php">hubs</a>) and the search box and filters provided below before adding requests</li><li>Please do not add duplicate or invalid requests </li><li>Try to provide download/information links for the file</li><li>Read the <a href="info.php">information page</a> for more</li></ul>'
+		,function(e){$.get('kill_dialog.php');});	//sets cookie dcp_dialog_shown
+	<?php
+		}
+	?>
+
 });
 function set_showperpg(){
 	spp=$("#showperpg").val();

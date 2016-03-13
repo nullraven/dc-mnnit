@@ -74,7 +74,7 @@ function getFooter()
 	//$val=exec('wc -l downlog.txt');
 
 
-	echo '<nav class="navbar navbar-default navbar-fixed-bottom" style="background-color:#DDD;background-image:none;" id="footr"><div class="col-md-4 col-md-offset-5"><p style="margin-top:10px;"><b>Created By :</b> Vandit Jain, Harsh Agarwal, -Bloodraven- </p></div><div class="pull-right"><p style="margin-top:10px; margin-right:25px;"><b>Your IP: </b>'.$_SERVER[REMOTE_ADDR].'</div></nav>';//<b>Page Hits: </b>'.intval($val).'</p>
+	echo '<nav class="navbar navbar-default navbar-fixed-bottom" style="background-color:#DDD;background-image:none;" id="footr"><div class="col-md-4 col-md-offset-5"><p style="margin-top:10px;"><b>Created By :</b> Vandit Jain, Harsh Agarwal, -Bloodraven- </p></div><div class="pull-right"><p style="margin-top:10px; margin-right:25px;"><b>Your IP: </b>'.$_SERVER['REMOTE_ADDR'].'</div></nav>';//<b>Page Hits: </b>'.intval($val).'</p>
 	
 }
 
@@ -114,7 +114,7 @@ function getHeader($page)
         <li <?= $page=="admin.php"?"class=\"active\"":"";?>><a href="admin.php"><span class="glyphicon glyphicon-user"></span> <?php echo $_SESSION['user']; ?></a></li>
       <li <?= $page=="logout.php"?"class=\"active\"":"";?>><a href="logout.php"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
       <?php } else { ?>
-      <li ><p class="navbar-text"><a href="admin.php"><?php echo $_SESSION['user']; ?> </a></p></li>
+      <li ><p class="navbar-text"><a href="admin.php"><?=isset($_SESSION['user'])?$_SESSION['user']:'' ?> </a></p></li>
       <li <?= $page=="admin.php"?"class=\"active\"":"";?>><a href="admin.php"><span class="glyphicon glyphicon-user"></span> Hub Admin</a></li>
       <?php } ?>
       </ul>
@@ -134,8 +134,9 @@ function get_head(){
         <link rel="stylesheet" href="<?=CONST_SITE_URL; ?>/css/bootstrap.min.css">
         <link rel="stylesheet" href="<?=CONST_SITE_URL?>/css/bootstrap-theme.min.css">
         <link rel="stylesheet" href="<?=CONST_SITE_URL?>/css/mainsite.css">
-        <link rel="stylesheet" href="<?=CONST_SITE_URL?>/tablesorter/css/theme.blue.css">
+        <!--<link rel="stylesheet" href="<?/*=CONST_SITE_URL*/?>/tablesorter/css/theme.blue.css">-->
         <link rel="stylesheet" href="<?=CONST_SITE_URL?>/chosen/chosen.min.css">
+
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
@@ -154,6 +155,7 @@ function get_head(){
         <script src="<?=CONST_SITE_URL?>/js/bootstrap.min.js"></script>
         <script src="<?=CONST_SITE_URL?>/js/search.js"></script>
         <script src="<?=CONST_SITE_URL?>/chosen/chosen.jquery.min.js"></script>
+		<script src="<?=CONST_SITE_URL?>/js/bootbox.min.js"></script>
 	</head>
 <?php	
 }

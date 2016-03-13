@@ -33,7 +33,7 @@ require_once("../include/function.php");
 
 
 <?php
-if(!isset($_SESSION['count']) || (date()-$_SESSION['opentime'])>5*60){
+/*if(!isset($_SESSION['count']) || (date()-$_SESSION['opentime'])>5*60){
 	$_SESSION['count']=0;
 	$_SESSION['opentime']=date();
 }
@@ -41,7 +41,7 @@ else $_SESSION['count']++;
 if($_SESSION['count']==0){
 	$content=date("H:i:s d/m/y")." ".json_encode($_SERVER)."\n";
 	file_put_contents("./downlog",$content,FILE_APPEND);
-}
+}*/
 getHeader("proxy.php");
 ?>
 <h4 class="col-md-offset-2 col-md-6 text-success"><span class="glyphicon glyphicon-info-sign"></span> Status of Proxies</h4><br><br>
